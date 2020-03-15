@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- TODO: change colors and apply in places. -->
+    <color name="colorPrimary">#2c2745</color>
+    <color name="colorPrimaryDark">#0f0d18</color>
+
+    <color name="colorSecondary">#f2b63d</color>
+    <color name="colorSecondary2">#434b6b</color>
+    <color name="colorSecondaryDark">#ffc041</color>
+
+    <color name="colorAccent">#cbde50</color>
+    <color name="colorTeal">#aaffff</color>
+</resources>
