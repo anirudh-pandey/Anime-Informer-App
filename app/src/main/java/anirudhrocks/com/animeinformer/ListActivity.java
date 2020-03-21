@@ -1,15 +1,15 @@
 package anirudhrocks.com.animeinformer;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Menu;
@@ -18,14 +18,23 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import java.util.ArrayList;
 
 public class ListActivity extends AppCompatActivity {
 
     private ArrayList<Anime> animeInfoList;
+    private AnimeAdapter animeAdapter;
+    private AnimeDbHelper dbHelper;
     private ListView listView;
+    private static final int ANIME_PROFILE_CODE = 1;
+    private static final String ANIME_TITLE = "animeTitle";
+    private static final String LATEST_EPISODE = "latestEpisode";
+    private static final String LANGUAGE_TYPE = "languageType";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,34 +45,56 @@ public class ListActivity extends AppCompatActivity {
 
         listView = findViewById(R.id.anime_list);
 
-        animeInfoList = new ArrayList<>();
+        dbHelper = new AnimeDbHelper(this);
+        animeInfoList = dbHelper.getAnimeInfoList();
 
-        AnimeAdapter animeAdapter = new AnimeAdapter(this, animeInfoList);
+        animeAdapter = new AnimeAdapter(this, animeInfoList);
         listView.setAdapter(animeAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getApplicationContext(), AnimeProfile.class);
-
-                intent.putExtra("animeTitle", animeInfoList.get(position).getAnimeTitle());
-                intent.putExtra("latestEpisode", animeInfoList.get(position).getLatestEpisode());
-                startActivity(intent);
+                intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                intent.putExtra(ANIME_TITLE, animeInfoList.get(position).getAnimeTitle());
+                intent.putExtra(LATEST_EPISODE, animeInfoList.get(position).getLatestEpisode());
+                intent.putExtra(LANGUAGE_TYPE, animeInfoList.get(position).getLanguageType());
+                startActivityForResult(intent, ANIME_PROFILE_CODE);
             }
         });
-
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                deleteDialogMaker(animeInfoList.get(position));
+                return true;
+            }
+        });
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dialogMaker();
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
+                inputDialogMaker();
             }
         });
     }
 
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == ANIME_PROFILE_CODE && resultCode == RESULT_OK) {
+            String animeTitle = data.getStringExtra(ANIME_TITLE);
+            String latestEp = data.getStringExtra(LATEST_EPISODE);
+            String languageType = data.getStringExtra(LANGUAGE_TYPE);
+            for(Anime anime: animeInfoList) {
+                if(anime.getAnimeTitle().equals(animeTitle) && anime.getLanguageType().equals(languageType)) {
+                    anime.setLatestEpisode(latestEp);
+                }
+            }
+            animeAdapter.notifyDataSetChanged();
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -88,28 +119,36 @@ public class ListActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void dialogMaker() {
+    private void inputDialogMaker() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //        builder.setTitle("Enter the anime name:");
 
         LayoutInflater inflater = LayoutInflater.from(this);
-        View InflatedView = inflater.inflate(R.layout.activity_dialog, (ViewGroup) findViewById(android.R.id.content), false);
+        View InflatedView = inflater.inflate(R.layout.activity_input_dialog, (ViewGroup) findViewById(android.R.id.content), false);
 
         final EditText input = InflatedView.findViewById(R.id.anime_name_input);
+        final Switch dubSubToggle = InflatedView.findViewById(R.id.dub_sub_toggle);
+
         builder.setView(InflatedView)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
                         if (input != null) {
                             String enteredName = input.getText().toString();
+
                             if (!enteredName.isEmpty()) {
-                                Anime anime = new Anime(enteredName);
-                                animeInfoList.add(anime);
-                                Snackbar.make(findViewById(R.id.fab), "Anime name added successfully.", Snackbar.LENGTH_SHORT).show();
-                            } else if (enteredName.isEmpty()) {
-                                Snackbar.make(findViewById(R.id.fab), "Anime could not be added.", Snackbar.LENGTH_SHORT).show();
+                                Anime anime = new Anime(enteredName, getSwitchValue(dubSubToggle.isChecked()));
+                                boolean isSuccess = dbHelper.addAnimeInfo(anime);
+                                if(!isSuccess) {
+                                    Snackbar.make(findViewById(R.id.fab), "Similar Anime Component already exists.", Snackbar.LENGTH_SHORT).show();
+                                } else {
+                                    animeInfoList.add(anime);
+                                    Snackbar.make(findViewById(R.id.fab), "Anime name added successfully.", Snackbar.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                Snackbar.make(findViewById(R.id.fab), "Anime Name cannot be empty", Snackbar.LENGTH_SHORT).show();
                             }
+
                         }
                     }
                 })
@@ -120,6 +159,38 @@ public class ListActivity extends AppCompatActivity {
                     }
                 })
                 .show();
+    }
+
+
+    private void deleteDialogMaker(final Anime anime) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Do you want to delete: " + anime.getAnimeTitle() + " ?");
+
+        builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        animeInfoList.remove(anime);
+                        dbHelper.deleteAimeInfo(anime);
+
+                        animeAdapter.notifyDataSetChanged();
+                        Snackbar.make(findViewById(R.id.fab), "Anime Deleted successfully.", Snackbar.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                })
+                .show();
+    }
+
+    private String getSwitchValue(boolean switchSelection) {
+        if(switchSelection)
+            return "DUB";
+        else
+            return "SUB";
     }
 
 

@@ -2,16 +2,20 @@ package anirudhrocks.com.animeinformer;
 
 public class Anime {
 
-    private String animeTitle, latestEpisode;
+    private String animeTitle, latestEpisode, languageType;
 
-    public Anime(String animeTitle, String latestEpisode) {
+
+    public Anime(String animeTitle, String languageType) {
+        this(animeTitle, "--", languageType);
+    }
+
+
+    public Anime(String animeTitle, String latestEpisode, String languageType) {
         this.animeTitle = animeTitle;
         this.latestEpisode = latestEpisode;
+        this.languageType = languageType;
     }
 
-    public Anime(String animeTitle) {
-        this(animeTitle, "--");
-    }
 
     public String getAnimeTitle() {
         return animeTitle;
@@ -28,4 +32,13 @@ public class Anime {
     public void setLatestEpisode(String latestEpisode) {
         this.latestEpisode = latestEpisode;
     }
+
+    public String getLanguageType() {
+        return languageType;
+    }
+
+    public void setLanguageType(String languageType) {
+        this.languageType = languageType;
+    }
+
 }

@@ -20,11 +20,11 @@ public class AnimeAdapter extends ArrayAdapter<Anime> {
     private Context context;
     private ArrayList<Anime> animeInfoList;
 
-
     // ViewHolder class to make scrolling smoother.
     static class ViewHolder {
         TextView animeTitle;
         TextView latestEpisode;
+        TextView languageType;
     }
 
 
@@ -47,6 +47,7 @@ public class AnimeAdapter extends ArrayAdapter<Anime> {
             holder = new ViewHolder();
             holder.animeTitle = convertView.findViewById(R.id.anime_title);
             holder.latestEpisode = convertView.findViewById(R.id.latest_episode);
+            holder.languageType = convertView.findViewById(R.id.language_type);
             // view gets stored in memory
             convertView.setTag(holder);
         } else {
@@ -56,8 +57,12 @@ public class AnimeAdapter extends ArrayAdapter<Anime> {
 
         holder.animeTitle.setText(animeInfoList.get(position).getAnimeTitle());
         holder.latestEpisode.setText(animeInfoList.get(position).getLatestEpisode());
+        holder.languageType.setText(animeInfoList.get(position).getLanguageType());
 
         return convertView;
     }
+
+
+
 
 }

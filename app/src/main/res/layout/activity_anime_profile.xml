@@ -1,41 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AnimeProfile"
-    android:orientation="horizontal">
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="35dp"
+    tools:context=".AnimeProfile">
+
 
     <ImageView
         android:id="@+id/anime_image"
         android:layout_width="140dp"
         android:layout_height="140dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="53dp"
+        android:layout_margin="5dp"
         android:src="@mipmap/ic_launcher" />
 
     <TextView
         android:id="@+id/anime_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="211dp"
         android:text="Anime Name"
         android:textAlignment="center"
-        android:textColor="@color/colorPrimaryDark"
+        android:textColor="@color/colorOnSecondary"
         android:textSize="25dp"
         android:textStyle="bold" />
+
+
+    <TextView
+        android:id="@+id/language_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="2dp"
+        android:text="DUB"
+        android:background="#e7e7e7"
+        android:shadowColor="#363636" />
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/anime_title"
-        android:orientation="horizontal"
-        android:textAlignment="center">
+        android:gravity="center"
+        android:orientation="horizontal">
 
         <TextView
 
@@ -60,19 +72,18 @@
 
     </LinearLayout>
 
+    <Button
+        android:id="@+id/go_to_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Go To Latest Episode" />
+
 
     <Button
         android:id="@+id/refresh_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="240dp"
         android:text="Refresh" />
 
 
-
-    <!--</LinearLayout>-->
-
-</RelativeLayout>
+</LinearLayout>
