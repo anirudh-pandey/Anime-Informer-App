@@ -14,7 +14,7 @@ import java.net.UnknownHostException;
 
 public class LatestEpInfo implements Runnable {
     private volatile String[] latestEpInfo;
-    private static final String basicUrl = "https://www16.gogoanime.io/";
+    private static final String basicUrl = "https://ww4.gogoanime2.org/";
     private String animeTitle, languageType;
     private View view;
 
@@ -30,43 +30,34 @@ public class LatestEpInfo implements Runnable {
 
         try {
 
-            String urlToBeSearched = basicUrl + "category/" + animeTitle;
+            String urlToBeSearched = basicUrl + "anime/" + animeTitle;
             if(languageType.equals("DUB")) {
                 urlToBeSearched += "-" + languageType.toLowerCase();
             }
             Connection connection = Jsoup.connect(urlToBeSearched);
 
-            System.out.println(urlToBeSearched);
-            System.out.println("-------------------------------");
-
             Document doc = connection.get();
-            System.out.println(doc.title());
-            System.out.println("-------------------------------");
 
-            Element lastEpElem = doc.getElementById("episode_page").children().last();
+            Element lastEpElem = doc.getElementById("episode_related").children().last();
             String episode = lastEpElem.text();
 
             latestEpInfo = new String[2];
-            System.out.println(episode);
             // validation check required when only one episode has been released.
-            if(episode.contains("-")) {
-                latestEpInfo[0] = episode.split("-")[1];
+            if(episode != null && !episode.trim().isEmpty()) {
+                latestEpInfo[0] = episode.substring(3, episode.length()-4);
             } else {
-                latestEpInfo[0] = episode;
+                Snackbar.make(view, "No such anime present, please check if the name entered is correct.", Snackbar.LENGTH_LONG).show();
+                return;
             }
-            System.out.println(latestEpInfo[0]);
-            System.out.println("-------------------------------");
 
             // url of the latest Episode
             String epLink;
-            epLink = basicUrl + animeTitle;
+            epLink = basicUrl + "watch/" + animeTitle;
             if(languageType.equals("DUB")) {
                 latestEpInfo[1] += "-" + languageType.toLowerCase();
             }
-            epLink += "-episode-" + latestEpInfo[0];
+            epLink += "/" + latestEpInfo[0];
             latestEpInfo[1] = epLink;
-            System.out.println(latestEpInfo[1]);
-            System.out.println("-------------------------------");
 
         } catch (HttpStatusException e) {
             Snackbar.make(view, "No such anime present, please check if the name entered is correct.", Snackbar.LENGTH_LONG).show();

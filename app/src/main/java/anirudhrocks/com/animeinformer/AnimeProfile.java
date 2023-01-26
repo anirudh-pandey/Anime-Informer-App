@@ -19,7 +19,7 @@ public class AnimeProfile extends AppCompatActivity {
     private static final String ANIME_TITLE = "animeTitle";
     private static final String LATEST_EPISODE = "latestEpisode";
     private static final String LANGUAGE_TYPE = "languageType";
-    private static final String basicUrl = "https://www16.gogoanime.io/";
+    private static final String basicUrl = "https://ww4.gogoanime2.org/";
 
 
     @Override
@@ -68,7 +68,7 @@ public class AnimeProfile extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 String[] infoResult = epInfo.getLatestEpInfo();
-                if(infoResult[0] == null || infoResult[1] == null) {
+                if(infoResult[0] == null || infoResult[0].trim().isEmpty() || infoResult[1] == null || infoResult[1].trim().isEmpty()) {
                     Toast.makeText(view.getContext(), "Some Problem Occured! " +
                             "Could not find the latest episode", Toast.LENGTH_LONG).show();
                 } else {
@@ -113,11 +113,11 @@ public class AnimeProfile extends AppCompatActivity {
 
     private String linkMaker(String animeTitle, String latestEp, String languageType) {
         String title = animeTitle.toLowerCase().replace(' ', '-');
-        String link = basicUrl + title;
+        String link = basicUrl + "watch/" + title;
         if(languageType.equals("DUB")) {
             link += "-" + languageType.toLowerCase();
         }
-        link += "-episode-" + latestEpisode.getText();
+        link += "/" + latestEpisode.getText();
         return link;
     }
 

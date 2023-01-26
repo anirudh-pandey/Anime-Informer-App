@@ -46,7 +46,6 @@ public class AnimeDbHelper extends SQLiteOpenHelper {
 
     public boolean addAnimeInfo(Anime anime) {
         if (getCount(anime) == 0) {
-            System.out.println(getCount(anime));
             db = getWritableDatabase();
             ContentValues cv = new ContentValues();
             // see if the anime title is present or not
